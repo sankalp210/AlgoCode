@@ -1,17 +1,8 @@
 import express from 'express'
-import { addProblem, deleteProblem, getAllProblems, getProblem, updateProblem } from '../../controllers/problem.controller.js';
+import problemRouter from './problems.js';
 
-const problemRouter = express();
+const v1Router = express();
 
+v1Router.use('/problems',problemRouter);
 
-problemRouter.post('/id',addProblem);
-
-problemRouter.get('/:id',getProblem);
-
-problemRouter.get('',getAllProblems);
-
-problemRouter.delete('/:id',deleteProblem);
-
-problemRouter.put('/:id',updateProblem);
-
-export default problemRouter;
+export default v1Router;
