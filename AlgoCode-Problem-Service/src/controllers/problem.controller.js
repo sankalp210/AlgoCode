@@ -18,7 +18,7 @@ export async function addProblem(req,res,next){
     }
 }
 
-export async function getProblem(req,res){
+export async function getProblem(req,res,next){
     try {
         const problem = await problemService.getProblem(req.params.id);
         return res.status(StatusCodes.OK).json({
@@ -32,7 +32,7 @@ export async function getProblem(req,res){
     }
 }
 
-export async function getAllProblems(req,res){
+export async function getAllProblems(req,res,next){
     try {
         const problems = await problemService.getAllProblems();
         return res.status(StatusCodes.OK).json({
@@ -46,7 +46,7 @@ export async function getAllProblems(req,res){
     }
 }
 
-export async function deleteProblem(req,res){
+export async function deleteProblem(req,res,next){
     try {
         const problem = await problemService.deleteProblem(req.params.id);
         return res.status(StatusCodes.OK).json({
