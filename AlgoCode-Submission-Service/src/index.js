@@ -1,6 +1,6 @@
 const fastify = require('fastify')({ logger: false });
 
-const serverConfig = require('./config/server.config');
+const serverConfig = require('./config/serverConfig');
 
 const app = require('./app');
 
