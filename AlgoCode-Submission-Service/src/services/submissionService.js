@@ -1,17 +1,18 @@
-class submissionService{
-    constructor(submissionRespository){
-        this.submissionRespository = submissionRespository;
+const submissionQueueProducer = require("../producers/submissionQueueProducer");
+
+class submissionService {
+    constructor(submissionRepository) {
+        this.submissionRepository = submissionRepository;
     }
 
     async addSubmission(submissionData) {
-        const submission = this.submissionRepository.createSubmission(submissionData);
-        if(!submission) {
-            // TODO: Add error handling here
-            throw {messgae: "Not able to create submission"};
+        const submission = await this.submissionRepository.createSubmission(submissionData); // ✅ now works
+        if (!submission) {
+            throw { message: "Not able to create submission" };
         }
         console.log(submission);
-        const response = await SubmissionProducer(submission);
-        return {queueResponse: response, submission};
+        const response = await submissionQueueProducer(submission);
+        return { queueResponse: response, submission };
     }
 }
 

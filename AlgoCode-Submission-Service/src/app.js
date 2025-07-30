@@ -8,12 +8,12 @@ async function app(fastify, opts) {
     
     await fastify.register(cors);
 
-     fastify.register(servicePlugin);
-     fastify.register(repositoryPlugin);
+    await fastify.register(servicePlugin);
+    await fastify.register(repositoryPlugin);
 
 
     // register test routes
-    fastify.register(require('./routes/api/apiRoutes'), {prefix: '/api'});
+    await fastify.register(require('./routes/api/apiRoutes'), {prefix: '/api'});
 
 
 }

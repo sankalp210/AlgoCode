@@ -17,11 +17,11 @@ const submissionSchema = new mongoose.Schema({
         type: String,
         required: [true, "Language for the submission is missing"],
     },
-    status: {
-        type: String,
-        enum: ["Pending", "Success", "RE", "TLE", "MLE", "WA"],
-        default: "Pending"
-    }
+    // status: {
+    //     type: String,
+    //     enum: ["Pending", "Success", "RE", "TLE", "MLE", "WA"],
+    //     default: "Pending"
+    // }
 });
 
 const Submission = mongoose.model('Submission', submissionSchema);
