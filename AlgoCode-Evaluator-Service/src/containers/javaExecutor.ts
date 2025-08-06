@@ -8,7 +8,14 @@ import decodeDockerStream from './dockerHelper';
 import pullImage from './pullImage';
 
 class JavaExecutor implements CodeExecutorStrategy {
-  async execute(code: string, inputTestCase: string): Promise<ExecutionResponse> {
+  async execute(
+    code: string,
+    inputTestCase: string,
+    outputCase: string,
+  ): Promise<ExecutionResponse> {
+    console.log('Java executer called');
+    console.log(code, inputTestCase, outputCase);
+
     const rawLogBuffer: Buffer[] = [];
 
     await pullImage(JAVA_IMAGE);
@@ -37,8 +44,17 @@ class JavaExecutor implements CodeExecutorStrategy {
 
     try {
       const codeResponse: string = await this.fetchDecodedStream(loggerStream, rawLogBuffer);
-      return { output: codeResponse, status: 'COMPLETED' };
+
+      if (codeResponse.trim() === outputCase.trim()) {
+        return { output: codeResponse, status: 'SUCCESS' };
+      } else {
+        return { output: codeResponse, status: 'WRONG ANSWER' };
+      }
     } catch (error) {
+      console.log('Error Occurred', error);
+      if (error === 'TIME LIMIT EXCEEDED') {
+        await javaDockerContainer.kill();
+      }
       return { output: error as string, status: 'ERROR' };
     } finally {
       await javaDockerContainer.remove();
@@ -48,12 +64,18 @@ class JavaExecutor implements CodeExecutorStrategy {
   fetchDecodedStream(loggerStream: NodeJS.ReadableStream, rawLogBuffer: Buffer[]): Promise<string> {
     // TODO: May be moved to the docker helper util
     return new Promise((res, rej) => {
+      const timeout = setTimeout(() => {
+        console.log('Timeout Called');
+        rej('TIME LIMIT EXCEEDED');
+      }, 2000);
+
       loggerStream.on('end', () => {
+        clearTimeout(timeout);
         console.log(rawLogBuffer);
         const completeBuffer = Buffer.concat(rawLogBuffer);
         const decodedStream = decodeDockerStream(completeBuffer);
-        console.log(decodedStream);
-        console.log(decodedStream.stdout);
+        // console.log(decodedStream);
+        // console.log(decodedStream.stdout);
         if (decodedStream.stderr) {
           rej(decodedStream.stderr);
         } else {

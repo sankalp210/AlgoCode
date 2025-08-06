@@ -8,7 +8,12 @@ import decodeDockerStream from './dockerHelper';
 import pullImage from './pullImage';
 
 class PythonExecutor implements CodeExecutorStrategy {
-  async execute(code: string, inputTestCase: string): Promise<ExecutionResponse> {
+  async execute(
+    code: string,
+    inputTestCase: string,
+    outputCase: string,
+  ): Promise<ExecutionResponse> {
+    console.log(code, inputTestCase, outputCase);
     const rawLogBuffer: Buffer[] = [];
 
     await pullImage(PYTHON_IMAGE);
@@ -51,13 +56,20 @@ class PythonExecutor implements CodeExecutorStrategy {
   }
 
   fetchDecodedStream(loggerStream: NodeJS.ReadableStream, rawLogBuffer: Buffer[]): Promise<string> {
+    // TODO: May be moved to the docker helper util
     return new Promise((res, rej) => {
+      const timeout = setTimeout(() => {
+        console.log('Timeout Called');
+        rej('TIME LIMIT EXCEEDED');
+      }, 2000);
+
       loggerStream.on('end', () => {
+        clearTimeout(timeout);
         console.log(rawLogBuffer);
         const completeBuffer = Buffer.concat(rawLogBuffer);
         const decodedStream = decodeDockerStream(completeBuffer);
-        console.log(decodedStream);
-        console.log(decodedStream.stdout);
+        // console.log(decodedStream);
+        // console.log(decodedStream.stdout);
         if (decodedStream.stderr) {
           rej(decodedStream.stderr);
         } else {
